@@ -29,16 +29,9 @@ class FinancialForwardBackwardFill:
         else:
             missing_info = pd.DataFrame(np.isnan(self.data_missing))
 
-        print("Forward/Backward Fill - Missing Pattern Analysis")
-        print("=" * 60)
-
         total_missing = missing_info.sum().sum()
         total_cells = missing_info.shape[0] * missing_info.shape[1]
         missing_pct = (total_missing / total_cells) * 100
-
-        print(f"Dataset shape: {missing_info.shape}")
-        print(f"Total missing values: {total_missing:,}")
-        print(f"Missing percentage: {missing_pct:.2f}%")
 
         # Check for edge cases (first/last row missing)
         first_row_missing = missing_info.iloc[0, :].sum()
@@ -79,8 +72,6 @@ class FinancialForwardBackwardFill:
         Forward Fill (LOCF) - Last Observation Carried Forward
         Uses previous valid value to fill missing data
         """
-        print("\nFORWARD FILL (LOCF) - Last Observation Carried Forward")
-        print("=" * 60)
 
         if isinstance(self.data_missing, pd.DataFrame):
             imputed_data = self.data_missing.copy()
@@ -91,8 +82,6 @@ class FinancialForwardBackwardFill:
                 imputed_data[col] = imputed_data[col].fillna(method='ffill')
                 after_count = imputed_data[col].isnull().sum()
                 filled_count = before_count - after_count
-                print(f"  {col}: filled {filled_count} values via forward fill")
-
                 if after_count > 0:
                     print(f"    WARNING: {after_count} values still missing (no prior value available)")
 
@@ -130,9 +119,6 @@ class FinancialForwardBackwardFill:
         Backward Fill (NOCB) - Next Observation Carried Backward
         Uses next valid value to fill missing data
         """
-        print("\nBACKWARD FILL (NOCB) - Next Observation Carried Backward")
-        print("=" * 60)
-
         if isinstance(self.data_missing, pd.DataFrame):
             imputed_data = self.data_missing.copy()
 
@@ -142,8 +128,6 @@ class FinancialForwardBackwardFill:
                 imputed_data[col] = imputed_data[col].fillna(method='bfill')
                 after_count = imputed_data[col].isnull().sum()
                 filled_count = before_count - after_count
-                print(f"  {col}: filled {filled_count} values via backward fill")
-
                 if after_count > 0:
                     print(f"    WARNING: {after_count} values still missing (no future value available)")
 
@@ -182,8 +166,6 @@ class FinancialForwardBackwardFill:
         1. First apply forward fill
         2. Then apply backward fill to remaining gaps
         """
-        print("\nCOMBINED FORWARD-BACKWARD FILL")
-        print("=" * 50)
 
         # Start with forward fill
         if isinstance(self.data_missing, pd.DataFrame):
@@ -199,7 +181,6 @@ class FinancialForwardBackwardFill:
             final_missing = imputed_data.isnull().sum().sum()
             filled_count = original_missing - final_missing
 
-            print(f"  Total values filled: {filled_count}")
             print(f"  Remaining missing: {final_missing}")
 
         else:
@@ -221,8 +202,6 @@ class FinancialForwardBackwardFill:
             original_missing = np.sum(np.isnan(self.data_missing))
             final_missing = np.sum(np.isnan(imputed_data))
             filled_count = original_missing - final_missing
-
-            print(f"  Total values filled: {filled_count}")
             print(f"  Remaining missing: {final_missing}")
 
         self.imputation_results['combined_fill'] = imputed_data
@@ -391,21 +370,3 @@ class FinancialForwardBackwardFill:
 
             # Find best method
             best_method = comparison_df['RMSE'].idxmin()
-            print(f"\nBEST PERFORMING: {best_method.replace('_', ' ').title()}")
-
-        print(f"\nFINANCIAL TIME SERIES RECOMMENDATIONS:")
-        print("-" * 45)
-        print("BEST CHOICE: Combined Fill")
-        print("  - Fills most gaps possible")
-        print("  - Uses both past and future information")
-        print("  - Minimal remaining missing values")
-
-        print(f"\nFORWARD FILL (LOCF):")
-        print("  - Conservative approach")
-        print("  - Only uses past information")
-        print("  - Good for real-time applications")
-
-        print(f"\nBACKWARD FILL (NOCB):")
-        print("  - Uses future information")
-        print("  - Good for filling beginning gaps")
-        print("  - Less realistic for trading strategies")
