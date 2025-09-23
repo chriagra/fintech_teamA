@@ -258,14 +258,10 @@ def main():
     print(f"Combined fill imputation gives SMAPE={cfill_smape}")
 
     #---problem6
-    analyzer = advancedStuff(dataSet_weekends, dataSet)
+    adv_analyzer = advancedStuff(dataSet_weekends, dataSet)
 
     # Run comprehensive analysis
-    #results = analyzer.compare_all_methods(n_neighbors = 5)
-
-    # Access specific results
-    #best_imputed = results['Scaled KNN']  # Usually performs best
-    #print(pd.DataFrame(best_imputed).head(10))
+    results = adv_analyzer.compare_all_methods(n_neighbors = 5)
 
     pass
 
