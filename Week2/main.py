@@ -62,8 +62,7 @@ def problem2(basic_analyzer, show_plot=False):
                 rmse_results[f'RMSE_{var_window}days'] = mae_rmse.loc['RMSE']
 
     print("Metrics on basic interpolation methods calculated!\n")
-    print("Format:!\n")
-    print("{metric}_{window}: [{rolling_mean} {rolling_median}]\n")
+    print("Format: {metric}_{window}: [{rolling_mean} {rolling_median}]\n")
 
     for key in mae_results:
         print(f"{key}: {mae_results[key].values}")
@@ -103,7 +102,7 @@ def problem2(basic_analyzer, show_plot=False):
     ax2.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.show()
+    #plt.show()
 
     return mae_results, rmse_results
 
@@ -148,6 +147,37 @@ def problem4(actual, predicted, method_name=""):
 
     return {'MAE': mae, 'RMSE': rmse, 'N_points': len(actual_clean)}
 
+def problem5_smape(orig_vals_df, imp_vals_df):
+    # Force everything to be numpy arrays
+    if hasattr(orig_vals_df, 'values'):
+        orig_vals = orig_vals_df.values.copy()
+    else:
+        orig_vals = orig_vals_df.copy()
+
+    if hasattr(imp_vals_df, 'values'):
+        imp_vals = imp_vals_df.values.copy()
+    else:
+        imp_vals = imp_vals_df.copy()
+
+    nan_mask = np.isnan(orig_vals)
+    orig_vals[nan_mask] = 0
+
+    abs_differences = np.abs(orig_vals - imp_vals)
+    # Calculate the denominator for sMAPE
+    denominator = (np.abs(orig_vals) + np.abs(imp_vals)) / 2
+
+    # Create a mask for non-zero denominators to avoid division by zero
+    nonzero_mask = denominator != 0
+
+    if np.sum(nonzero_mask) > 0:
+        pct_errors = abs_differences[nonzero_mask] / denominator[nonzero_mask]
+        smape = np.mean(pct_errors) * 100
+    else:
+        # If all denominators are zero, sMAPE is defined as infinite
+        smape = float('inf')
+
+    return smape
+
 def main():
 
     #Using this for continuity with Week1
@@ -185,7 +215,7 @@ def main():
     #---problem3
     print("_" *40)
     print("PROBLEM3")
-    print("_" *40 + "\n")
+    print("_" *40)
 
     mid_analyzer = midStuff(dataSet_weekends, dataSet)
 
@@ -203,11 +233,11 @@ def main():
     #---problem4
     print("_" *40)
     print("PROBLEM4")
-    print("_" *40 + "\n")
+    print("_" *40)
 
     dS_interpolated_1 = dataSet_weekends.interpolate(method="linear")
     dS_interpolated_2 = dataSet_weekends.interpolate(method="polynomial", order=2)
-    print("Interpolation methods completed!\n")
+    print("Interpolation methods completed!")
 
     metrics_1 = problem4(dataSet_weekends, dS_interpolated_1, "Linear Interpolation")
     metrics_2 = problem4(dataSet_weekends, dS_interpolated_2, "Polynomial Interpolation")
@@ -216,17 +246,26 @@ def main():
     #---problem5
     print("_" *40)
     print("PROBLEM5")
-    print("_" *40 + "\n")
+    print("_" *40)
+
+    simple_mean_ds = basic_analyzer.simple_mean_imputation()
+    cfill_ds = mid_analyzer.combined_fill()
+    simple_mean_smape = problem5_smape(dataSet_weekends, simple_mean_ds)
+    cfill_smape = problem5_smape(dataSet_weekends, cfill_ds)
+
+    print("Printing SMAPE indicatively for 2 imputation methods....")
+    print(f"Simple mean imputation gives SMAPE={simple_mean_smape}")
+    print(f"Combined fill imputation gives SMAPE={cfill_smape}")
 
     #---problem6
     analyzer = advancedStuff(dataSet_weekends, dataSet)
 
     # Run comprehensive analysis
-    results = analyzer.compare_all_methods(n_neighbors = 5)
+    #results = analyzer.compare_all_methods(n_neighbors = 5)
 
     # Access specific results
-    best_imputed = results['Scaled KNN']  # Usually performs best
-    print(pd.DataFrame(best_imputed).head(10))
+    #best_imputed = results['Scaled KNN']  # Usually performs best
+    #print(pd.DataFrame(best_imputed).head(10))
 
     pass
 

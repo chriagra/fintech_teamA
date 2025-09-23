@@ -57,7 +57,6 @@ class FinancialForwardBackwardFill:
             max_consecutive_gaps.append(max_consecutive)
 
         overall_max_gap = max(max_consecutive_gaps) if max_consecutive_gaps else 0
-        print(f"  Maximum consecutive gap: {overall_max_gap} periods")
 
         return {
             'total_missing': total_missing,
@@ -180,9 +179,6 @@ class FinancialForwardBackwardFill:
             original_missing = self.data_missing.isnull().sum().sum()
             final_missing = imputed_data.isnull().sum().sum()
             filled_count = original_missing - final_missing
-
-            print(f"  Remaining missing: {final_missing}")
-
         else:
             imputed_data = self.data_missing.copy()
             rows, cols = imputed_data.shape
@@ -202,7 +198,6 @@ class FinancialForwardBackwardFill:
             original_missing = np.sum(np.isnan(self.data_missing))
             final_missing = np.sum(np.isnan(imputed_data))
             filled_count = original_missing - final_missing
-            print(f"  Remaining missing: {final_missing}")
 
         self.imputation_results['combined_fill'] = imputed_data
         return imputed_data
@@ -294,9 +289,14 @@ class FinancialForwardBackwardFill:
             imp_trend = np.mean(np.diff(imp_vals))
             trend_error = abs(orig_trend - imp_trend)
 
-            print(f"  Original trend: {orig_trend:.3f}/period")
-            print(f"  Imputed trend: {imp_trend:.3f}/period")
-            print(f"  Trend preservation error: {trend_error:.3f}")
+            high_corr_count = 0
+            stocks = imputed_data.columns
+            for i, stock1 in enumerate(stocks):
+                for stock2 in stocks[i + 1:]:
+                    corr_value = imputed_data[stock1].corr(imputed_data[stock2])
+                    if corr_value < 1 and corr_value > 0.6:
+                        high_corr_count += 1
+            print(f"  The high-correlation pairs are: {high_corr_count}")
 
             # Financial interpretation
             if mape < 2:
@@ -325,12 +325,6 @@ class FinancialForwardBackwardFill:
             return None
 
     def compare_all_methods(self):
-        """
-        Compare Forward Fill, Backward Fill, and Combined approaches
-        """
-        print("\n" + "=" * 80)
-        print("FORWARD/BACKWARD FILL COMPREHENSIVE ANALYSIS")
-        print("=" * 80)
 
         # Analyze missing pattern
         pattern_info = self.analyze_missing_pattern()

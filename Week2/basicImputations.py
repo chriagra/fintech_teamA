@@ -75,7 +75,6 @@ class FinancialImputationAnalyzer:
             consecutive_missing.append(max_consecutive)
 
         max_consecutive_overall = max(consecutive_missing)
-        print(f"Maximum consecutive missing values: {max_consecutive_overall}")
 
         if max_consecutive_overall > 5:
             print("⚠️  WARNING: Long consecutive missing periods detected!")
@@ -119,7 +118,6 @@ class FinancialImputationAnalyzer:
                 print(f"  ... and {imputed_data.shape[1] - 5} more assets")
 
         self.imputation_results['simple_mean'] = imputed_data
-        print("\nSIMPLE MEAN Imputation Completed")
         return imputed_data
 
     def simple_median_imputation(self):
@@ -151,7 +149,6 @@ class FinancialImputationAnalyzer:
                 print(f"  ... and {imputed_data.shape[1] - 5} more assets")
 
         self.imputation_results['simple_median'] = imputed_data
-        print("\nSIMPLE MEDIAN Imputation Completed")
         return imputed_data
 
     def rolling_mean_imputation(self, window):
@@ -203,7 +200,6 @@ class FinancialImputationAnalyzer:
                 print(f"  ... and {imputed_data.shape[1] - 5} more assets")
 
         self.imputation_results['rolling_mean'] = imputed_data
-        print("\nROLLING MEAN Imputation Completed")
         return imputed_data
 
     def rolling_median_imputation(self, window):
@@ -255,7 +251,6 @@ class FinancialImputationAnalyzer:
                 print(f"  ... and {imputed_data.shape[1] - 5} more assets")
 
         self.imputation_results['rolling_median'] = imputed_data
-        print("ROLLING MEDIAN Imputation Completed")
         return imputed_data
 
     def evaluate_imputation_quality(self, method_name, imputed_data):
@@ -353,14 +348,6 @@ class FinancialImputationAnalyzer:
             else:
                 print("  ⚠️  Note: MAPE could not be calculated due to zero values")
 
-            self.calc_sMAPE(missing_np, imputed_np)
-
-            '''
-            corr_matrix = imputed_data.corr()
-            high_corr_mask = corr_matrix.where((corr_matrix > 0.6) & (corr_matrix < 1))
-            high_corr_count = high_corr_mask.count().sum()
-            '''
-
             high_corr_count = 0
             stocks = imputed_data.columns
             for i, stock1 in enumerate(stocks):
@@ -435,25 +422,3 @@ class FinancialImputationAnalyzer:
         best_method = comparison_df['RMSE'].idxmin()
         print(f"\n🏆 BEST PERFORMING METHOD: {best_method.replace('_', ' ').title()}")
         print(f"   RMSE: {comparison_df.loc[best_method, 'RMSE']:.4f}")
-
-    def calc_sMAPE(self, orig_vals, imp_vals):
-        nan_mask = np.isnan(orig_vals)
-        orig_vals[nan_mask] = 0
-
-        abs_differences = np.abs(orig_vals - imp_vals)
-
-        # Calculate the denominator for sMAPE
-        denominator = (np.abs(orig_vals) + np.abs(imp_vals)) / 2
-
-        # Create a mask for non-zero denominators to avoid division by zero
-        nonzero_mask = denominator != 0
-
-        if np.sum(nonzero_mask) > 0:
-            pct_errors = abs_differences[nonzero_mask] / denominator[nonzero_mask]
-            smape = np.mean(pct_errors) * 100
-        else:
-            # If all denominators are zero, sMAPE is defined as infinite
-            smape = float('inf')
-
-        # Print the result
-        print(f"  ...The sMAPE is: {smape:.2f}%")
