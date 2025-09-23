@@ -300,7 +300,7 @@ class FinancialImputationAnalyzer:
             imp_vals = []
 
             rows, cols = missing_np.shape
-            #print(missing_np.shape)
+
             for i in range(rows):
                 for j in range(cols):
                     if mask[i, j]:  # This was originally missing
@@ -313,8 +313,6 @@ class FinancialImputationAnalyzer:
             #--------replace nans w/ 0s
             nan_mask = np.isnan(orig_vals)
             orig_vals[nan_mask] = 0
-
-            #print(f"  Extracted {len(orig_vals)} value pairs")
 
             # Simple metrics - MANUAL CALCULATION ONLY
             differences = orig_vals - imp_vals
@@ -459,7 +457,3 @@ class FinancialImputationAnalyzer:
 
         # Print the result
         print(f"  ...The sMAPE is: {smape:.2f}%")
-
-
-
-
