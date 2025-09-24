@@ -12,6 +12,33 @@ from advancedImputations import SimpleSklearnKNNImputation as advancedStuff
 
 warnings.filterwarnings('ignore')
 
+def introduce_missing_values(data, n_missing, seed=123):
+    np.random.seed(seed)
+
+    # Work with a copy to preserve original data
+    if isinstance(data, pd.DataFrame):
+        data_with_missing = data.copy()
+        rows, cols = data.shape
+    else:
+        data_with_missing = data.copy().astype(float)  # Convert to float to allow NaN
+        rows, cols = data.shape
+
+    # Generate random positions for missing values
+    total_positions = rows * cols
+    missing_indices = np.random.choice(total_positions, size=n_missing, replace=False)
+
+    # Convert flat indices to (row, col) positions
+    missing_positions = [(idx // cols, idx % cols) for idx in missing_indices]
+
+    # Introduce missing values
+    for row, col in missing_positions:
+        if isinstance(data_with_missing, pd.DataFrame):
+            data_with_missing.iloc[row, col] = np.nan
+        else:
+            data_with_missing[row, col] = np.nan
+
+    return data_with_missing, missing_positions
+
 def transform_financial_data(input_file='combinedPriced.csv', output_file='alignedDataSet.csv'):
     import pandas as pd
 
@@ -106,46 +133,61 @@ def problem2(basic_analyzer, show_plot=False):
 
     return mae_results, rmse_results
 
-def problem4(actual, predicted, method_name=""):
+def problem4(data_missing, data_imputed, method_name=""):
 
     # Convert to numpy arrays if needed
-    if hasattr(actual, 'values'):
-        actual_np = actual.values
+    if hasattr(data_missing, 'values'):
+        missing_np = data_missing.values
     else:
-        actual_np = np.array(actual)
+        missing_np = np.array(data_missing)
 
-    if hasattr(predicted, 'values'):
-        predicted_np = predicted.values
+    if hasattr(data_imputed, 'values'):
+        imputed_np = data_imputed.values
     else:
-        predicted_np = np.array(predicted)
+        imputed_np = np.array(data_imputed)
 
-    # Flatten arrays for easier calculation
-    actual_flat = actual_np.flatten()
-    predicted_flat = predicted_np.flatten()
+    # Create mask
+    mask = np.isnan(missing_np)
+    total_missing = np.sum(mask)
+    # print(f"  Found {total_missing} missing values to evaluate")
 
-    # Remove NaN values (only compare where both have values)
-    mask = ~(np.isnan(actual_flat) | np.isnan(predicted_flat))
-    actual_clean = actual_flat[mask]
-    predicted_clean = predicted_flat[mask]
+    if total_missing == 0:
+        print("  No missing values found!")
+        return None
 
-    if len(actual_clean) == 0:
-        print(f"Warning: No valid data points for comparison{' for ' + method_name if method_name else ''}")
-        return {'MAE': np.nan, 'RMSE': np.nan}
+    # Extract values using simple indexing
+    orig_vals = []
+    imp_vals = []
 
-    # Calculate metrics
-    differences = actual_clean - predicted_clean
-    mae = np.mean(np.abs(differences))
+    rows, cols = missing_np.shape
+
+    for i in range(rows):
+        for j in range(cols):
+            if mask[i, j]:  # This was originally missing
+                orig_vals.append(missing_np[i, j])
+                imp_vals.append(imputed_np[i, j])
+
+    orig_vals = np.array(orig_vals)
+    imp_vals = np.array(imp_vals)
+
+    # --------replace nans w/ 0s
+    nan_mask = np.isnan(orig_vals)
+    orig_vals[nan_mask] = 0
+
+    # Simple metrics - MANUAL CALCULATION ONLY
+    differences = orig_vals - imp_vals
+    abs_differences = np.abs(differences)
+
+    mae = np.mean(abs_differences)
     mse = np.mean(differences ** 2)
     rmse = np.sqrt(mse)
 
-    # Print results
     if method_name:
         print(f"\n{method_name}:")
     print(f"  MAE: {mae:.4f}")
     print(f"  RMSE: {rmse:.4f}")
-    print(f"  Data points compared: {len(actual_clean)}")
 
-    return {'MAE': mae, 'RMSE': rmse, 'N_points': len(actual_clean)}
+    return {'MAE': mae, 'RMSE': rmse}
 
 def problem5_smape(orig_vals_df, imp_vals_df):
     # Force everything to be numpy arrays
@@ -192,10 +234,16 @@ def main():
     add_weekends = pd.date_range(start=dataSet.index.min(), end=dataSet.index.max())
     dataSet_weekends = dataSet.reindex(add_weekends)
 
+    #introduce more missing values to test methods
+    df_missing, missing_pos_df = introduce_missing_values(dataSet_weekends, n_missing=1000)
+
+    # For numpy array
+    financial_data_missing, missing_pos_array = introduce_missing_values(dataSet_weekends, n_missing=1000)
+
     og_mean = dataSet_weekends.mean()
     og_std = dataSet_weekends.std()
 
-    basic_analyzer = basicStuff(dataSet_weekends, dataSet)
+    basic_analyzer = basicStuff(df_missing, dataSet)
     imputated_dataset = basic_analyzer.simple_mean_imputation()
     imp_mean = imputated_dataset.mean()
     imp_std = imputated_dataset.std()
@@ -217,7 +265,7 @@ def main():
     print("PROBLEM3")
     print("_" *40)
 
-    mid_analyzer = midStuff(dataSet_weekends, dataSet)
+    mid_analyzer = midStuff(df_missing, dataSet)
 
     # Run comprehensive analysis
     results = mid_analyzer.compare_all_methods()
@@ -235,13 +283,12 @@ def main():
     print("PROBLEM4")
     print("_" *40)
 
-    dS_interpolated_1 = dataSet_weekends.interpolate(method="linear")
-    dS_interpolated_2 = dataSet_weekends.interpolate(method="polynomial", order=2)
+    dS_interpolated_1 = df_missing.interpolate(method="linear")
+    dS_interpolated_2 = df_missing.interpolate(method="polynomial", order=2)
     print("Interpolation methods completed!")
 
-    metrics_1 = problem4(dataSet_weekends, dS_interpolated_1, "Linear Interpolation")
-    metrics_2 = problem4(dataSet_weekends, dS_interpolated_2, "Polynomial Interpolation")
-    metrics_comparison = problem4(dS_interpolated_1, dS_interpolated_2, "Linear vs Polynomial")
+    metrics_1 = problem4(df_missing, dS_interpolated_1, "Linear Interpolation")
+    metrics_2 = problem4(df_missing, dS_interpolated_2, "Polynomial Interpolation")
 
     #---problem5
     print("_" *40)
@@ -250,15 +297,15 @@ def main():
 
     simple_mean_ds = basic_analyzer.simple_mean_imputation()
     cfill_ds = mid_analyzer.combined_fill()
-    simple_mean_smape = problem5_smape(dataSet_weekends, simple_mean_ds)
-    cfill_smape = problem5_smape(dataSet_weekends, cfill_ds)
+    simple_mean_smape = problem5_smape(df_missing, simple_mean_ds)
+    cfill_smape = problem5_smape(df_missing, cfill_ds)
 
     print("Printing SMAPE indicatively for 2 imputation methods....")
     print(f"Simple mean imputation gives SMAPE={simple_mean_smape}")
     print(f"Combined fill imputation gives SMAPE={cfill_smape}")
 
     #---problem6
-    adv_analyzer = advancedStuff(dataSet_weekends, dataSet)
+    adv_analyzer = advancedStuff(df_missing, dataSet)
 
     # Run comprehensive analysis
     results = adv_analyzer.compare_all_methods(n_neighbors = 5)
