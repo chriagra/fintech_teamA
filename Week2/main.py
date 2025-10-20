@@ -306,9 +306,15 @@ def main():
 
     #---problem6
     adv_analyzer = advancedStuff(df_missing, dataSet)
+    impData = adv_analyzer.knn_imputation_basic()
+
+    #print(impData)
+    ticks = dataSet_weekends.columns
+    final_data = pd.DataFrame(impData, columns=ticks, index=dataSet_weekends.index)
+    final_data.to_csv("finalData.csv")
 
     # Run comprehensive analysis
-    results = adv_analyzer.compare_all_methods(n_neighbors = 5)
+    #results = adv_analyzer.compare_all_methods(n_neighbors = 5)
 
     pass
 
