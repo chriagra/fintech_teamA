@@ -40,7 +40,6 @@ def introduce_missing_values(data, n_missing, seed=123):
     return data_with_missing, missing_positions
 
 def transform_financial_data(input_file='combinedPriced.csv', output_file='alignedDataSet.csv'):
-    import pandas as pd
 
     ogCSV = pd.read_csv(input_file)
 
@@ -311,6 +310,7 @@ def main():
     #print(impData)
     ticks = dataSet_weekends.columns
     final_data = pd.DataFrame(impData, columns=ticks, index=dataSet_weekends.index)
+    print(final_data)
     final_data.to_csv("finalData.csv")
 
     # Run comprehensive analysis
