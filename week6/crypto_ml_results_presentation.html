@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Price Prediction: ML Model Comparison</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: white;
+            margin: 20px auto;
+            max-width: 1200px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        h2 {
+            color: #34495e;
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        h3 {
+            color: #555;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .highlight {
+            background-color: #d4edda;
+            font-weight: bold;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin: 30px 0;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .metric-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .winner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.3em;
+        }
+        
+        .insight-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .warning-box {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        ul {
+            margin: 15px 0 15px 40px;
+        }
+        
+        li {
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        
+        .correlation-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #e74c3c;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title -->
+    <div class="slide">
+        <h1>Cryptocurrency Price Prediction</h1>
+        <div class="subtitle">Machine Learning Model Comparison & Interpretability Analysis</div>
+        <div class="metric-grid" style="margin-top: 60px;">
+            <div class="metric-card">
+                <h4>Models Evaluated</h4>
+                <div class="metric-value">3</div>
+                <p>Random Forest, Gradient Boosting, XGBoost</p>
+            </div>
+            <div class="metric-card">
+                <h4>Features Used</h4>
+                <div class="metric-value">10</div>
+                <p>Major cryptocurrency tickers</p>
+            </div>
+            <div class="metric-card">
+                <h4>Validation Method</h4>
+                <div class="metric-value">5-Fold</div>
+                <p>Cross-Validation + Test Set</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Model Performance Comparison -->
+    <div class="slide">
+        <h2>Model Performance Comparison</h2>
+        
+        <h3>Test Set Performance</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>MSE</th>
+                    <th>MAE</th>
+                    <th>R²</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="highlight">
+                    <td><strong>Random Forest</strong></td>
+                    <td>0.872</td>
+                    <td>0.741</td>
+                    <td><strong>0.0131</strong></td>
+                </tr>
+                <tr>
+                    <td>XGBoost</td>
+                    <td>0.915</td>
+                    <td>0.761</td>
+                    <td>-0.0355</td>
+                </tr>
+                <tr>
+                    <td>Gradient Boosting</td>
+                    <td>0.935</td>
+                    <td>0.769</td>
+                    <td>-0.0582</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>5-Fold Cross-Validation Results</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Mean R²</th>
+                    <th>Std R²</th>
+                    <th>Min R²</th>
+                    <th>Max R²</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="highlight">
+                    <td><strong>Random Forest</strong></td>
+                    <td><strong>-0.0203</strong></td>
+                    <td>0.0093</td>
+                    <td>-0.0278</td>
+                    <td>-0.0037</td>
+                </tr>
+                <tr>
+                    <td>XGBoost</td>
+                    <td>-0.1018</td>
+                    <td>0.0383</td>
+                    <td>-0.1572</td>
+                    <td>-0.0604</td>
+                </tr>
+                <tr>
+                    <td>Gradient Boosting</td>
+                    <td>-0.1034</td>
+                    <td>0.0288</td>
+                    <td>-0.1478</td>
+                    <td>-0.0617</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Slide 3: Statistical Significance -->
+    <div class="slide">
+        <h2>Statistical Significance Testing</h2>
+        <div class="subtitle">Paired t-tests on Cross-Validation R² Scores</div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Model 1</th>
+                    <th>Model 2</th>
+                    <th>Mean Diff (R²)</th>
+                    <th>t-statistic</th>
+                    <th>p-value</th>
+                    <th>Significance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Random Forest</td>
+                    <td>Gradient Boosting</td>
+                    <td>+0.0832</td>
+                    <td>4.73</td>
+                    <td>0.0091</td>
+                    <td><strong>**</strong></td>
+                </tr>
+                <tr>
+                    <td>Random Forest</td>
+                    <td>XGBoost</td>
+                    <td>+0.0815</td>
+                    <td>4.29</td>
+                    <td>0.0128</td>
+                    <td><strong>*</strong></td>
+                </tr>
+                <tr>
+                    <td>Gradient Boosting</td>
+                    <td>XGBoost</td>
+                    <td>-0.0017</td>
+                    <td>-0.08</td>
+                    <td>0.9432</td>
+                    <td>ns</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="winner">
+            <span class="emoji">🏆</span> Winner: Random Forest
+            <div style="margin-top: 10px; font-size: 0.9em;">
+                Significantly outperforms both Gradient Boosting (p < 0.01) and XGBoost (p < 0.05)
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>Significance Levels:</strong><br>
+            *** p < 0.001 (highly significant) | ** p < 0.01 (very significant) | * p < 0.05 (significant) | ns = not significant
+        </div>
+    </div>
+
+    <!-- Slide 4: Key Finding - Poor Predictive Power -->
+    <div class="slide">
+        <h2>Critical Finding: Limited Predictive Power</h2>
+        
+        <div class="warning-box">
+            <h3 style="margin: 0 0 15px 0; border: none; padding: 0;">⚠️ All Models Show Near-Zero or Negative R² Scores</h3>
+            <p><strong>Best Model R² = 0.0131 (test set) and -0.0203 (cross-validation)</strong></p>
+        </div>
+
+        <h3>What Does This Mean?</h3>
+        <ul>
+            <li><strong>R² ≈ 0:</strong> The model explains almost none of the variance in the target variable</li>
+            <li><strong>Negative R²:</strong> The model performs worse than simply predicting the mean</li>
+            <li><strong>Implication:</strong> Using raw cryptocurrency prices as features provides minimal predictive value</li>
+        </ul>
+
+        <h3>Why Is This Happening?</h3>
+        <div class="insight-box">
+            <ul>
+                <li><strong>Market Efficiency:</strong> Cryptocurrency markets may be semi-efficient, making price-based prediction difficult</li>
+                <li><strong>High Volatility:</strong> Crypto prices exhibit extreme volatility and noise</li>
+                <li><strong>Feature Engineering Gap:</strong> Raw prices lack financial context (momentum, volatility, trends, etc.)</li>
+                <li><strong>Multicollinearity:</strong> Cryptocurrencies often move together, creating redundant information</li>
+            </ul>
+        </div>
+
+        <h3>Recommendations for Improvement</h3>
+        <ul>
+            <li>Engineer financial features: returns, moving averages, RSI, Bollinger Bands, momentum indicators</li>
+            <li>Include market microstructure: volume, bid-ask spreads, order book depth</li>
+            <li>Add sentiment data: social media sentiment, news sentiment</li>
+            <li>Consider time-series specific models: ARIMA, LSTM, Prophet</li>
+        </ul>
+    </div>
+
+    <!-- Slide 5: Feature Importance Comparison -->
+    <div class="slide">
+        <h2>Feature Importance Analysis</h2>
+        <div class="subtitle">Comparing Built-in vs SHAP Importance</div>
+
+        <div class="feature-list">
+            <div>
+                <h3>Built-in Importance (Random Forest)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Importance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>BTC-USD</td><td>0.1231</td></tr>
+                        <tr><td>SOL-USD</td><td>0.1094</td></tr>
+                        <tr><td>BNB-USD</td><td>0.1083</td></tr>
+                        <tr><td>DOGE-USD</td><td>0.1055</td></tr>
+                        <tr><td>XMR-USD</td><td>0.1026</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <h3>SHAP Importance</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Importance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>XMR-USD</td><td>0.0415</td></tr>
+                        <tr><td>LTC-USD</td><td>0.0370</td></tr>
+                        <tr><td>DOGE-USD</td><td>0.0344</td></tr>
+                        <tr><td>XLM-USD</td><td>0.0321</td></tr>
+                        <tr><td>XRP-USD</td><td>0.0279</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="correlation-value">
+            Correlation: 0.1359
+        </div>
+
+        <div class="warning-box">
+            <h3 style="margin: 0 0 10px 0; border: none; padding: 0;">🚨 Extremely Low Correlation!</h3>
+            <p>Built-in and SHAP importance rankings show almost no agreement (r = 0.14). This suggests:</p>
+            <ul style="margin-top: 10px;">
+                <li>Feature interactions are complex and non-linear</li>
+                <li>Built-in importance may be misleading due to feature correlations</li>
+                <li>SHAP provides more reliable attribution by accounting for feature interactions</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 6: Largest Disagreements -->
+    <div class="slide">
+        <h2>Biggest Disagreements Between Methods</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Built-in Rank</th>
+                    <th>SHAP Rank</th>
+                    <th>Difference</th>
+                    <th>Interpretation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>XMR-USD</strong></td>
+                    <td>#5</td>
+                    <td>#1</td>
+                    <td>-0.0492</td>
+                    <td>Undervalued by built-in method</td>
+                </tr>
+                <tr>
+                    <td><strong>SOL-USD</strong></td>
+                    <td>#2</td>
+                    <td>#10</td>
+                    <td>+0.0478</td>
+                    <td>Overvalued by built-in method</td>
+                </tr>
+                <tr>
+                    <td><strong>LTC-USD</strong></td>
+                    <td>#7</td>
+                    <td>#2</td>
+                    <td>-0.0388</td>
+                    <td>Undervalued by built-in method</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <h3 style="margin: 0 0 15px 0; border: none; padding: 0;">💡 Why the Disagreement?</h3>
+            <ul>
+                <li><strong>Built-in importance:</strong> Measures how often a feature is used for splitting (frequency-based)</li>
+                <li><strong>SHAP importance:</strong> Measures actual contribution to predictions, accounting for all possible feature interactions</li>
+                <li><strong>Multicollinearity:</strong> When cryptos move together (high correlation), built-in methods may arbitrarily favor one over another</li>
+                <li><strong>Conditional effects:</strong> A feature may be important only in specific contexts (interactions), which SHAP captures better</li>
+            </ul>
+        </div>
+
+        <div class="insight-box">
+            <strong>Practical Implication:</strong> Trust SHAP importance over built-in importance when features are correlated, especially in financial markets where assets often move together.
+        </div>
+    </div>
+
+    <!-- Slide 7: Key Takeaways -->
+    <div class="slide">
+        <h2>Key Takeaways & Recommendations</h2>
+
+        <h3>📊 Model Performance</h3>
+        <ul>
+            <li><strong>Random Forest</strong> is the best performer but still shows minimal predictive power (R² ≈ 0)</li>
+            <li>All models struggle to beat the baseline (predicting the mean)</li>
+            <li>Statistical tests confirm Random Forest's superiority, but practical utility is questionable</li>
+        </ul>
+
+        <h3>🔍 Feature Importance Insights</h3>
+        <ul>
+            <li>Low correlation (0.14) between built-in and SHAP importance is concerning</li>
+            <li>SHAP reveals that XMR-USD, LTC-USD, and DOGE-USD have stronger actual impact than raw importance suggests</li>
+            <li>Feature interactions play a significant role (not captured by simple importance metrics)</li>
+        </ul>
+
+        <h3>⚠️ Fundamental Issues</h3>
+        <div class="warning-box">
+            <strong>The current approach has structural limitations:</strong>
+            <ul style="margin-top: 10px;">
+                <li>Raw prices ≠ actionable financial signals</li>
+                <li>Missing temporal dynamics (time-series structure)</li>
+                <li>No economic context or market regime information</li>
+            </ul>
+        </div>
+
+        <h3>✅ Next Steps</h3>
+        <ol>
+            <li><strong>Feature Engineering:</strong> Create returns, momentum, volatility, moving averages, RSI, MACD</li>
+            <li><strong>Add Context:</strong> Include trading volume, market cap, sentiment scores</li>
+            <li><strong>Time-Series Models:</strong> Consider LSTM, GRU, or Transformer architectures</li>
+            <li><strong>Regularization:</strong> Test Ridge/Lasso with engineered features to handle multicollinearity</li>
+            <li><strong>Ensemble Approaches:</strong> Combine predictions from multiple model types</li>
+        </ol>
+    </div>
+
+    <!-- Slide 8: Conclusion -->
+    <div class="slide">
+        <h2>Conclusion</h2>
+        
+        <div class="info-box">
+            <h3 style="margin: 0 0 15px 0; border: none; padding: 0;">What We Learned</h3>
+            <p style="font-size: 1.1em; line-height: 1.8;">
+                This analysis demonstrates a critical lesson in quantitative finance: 
+                <strong>model selection matters less than feature engineering.</strong> 
+                Even the best machine learning algorithms cannot extract meaningful patterns 
+                from inadequate features.
+            </p>
+        </div>
+
+        <div class="metric-grid" style="margin-top: 40px;">
+            <div class="metric-card">
+                <h4>Model Winner</h4>
+                <div class="metric-value" style="font-size: 1.5em;">Random Forest</div>
+                <p>But needs better features</p>
+            </div>
+            <div class="metric-card">
+                <h4>Key Insight</h4>
+                <div class="metric-value" style="font-size: 1.5em;">r = 0.14</div>
+                <p>Importance methods disagree</p>
+            </div>
+            <div class="metric-card">
+                <h4>Main Finding</h4>
+                <div class="metric-value" style="font-size: 1.5em;">R² ≈ 0</div>
+                <p>Poor predictive power</p>
+            </div>
+        </div>
+
+        <div class="insight-box" style="margin-top: 40px;">
+            <h3 style="margin: 0 0 15px 0; border: none; padding: 0;">💡 Final Thought</h3>
+            <p style="font-size: 1.1em;">
+                The cryptocurrency market's complexity requires more sophisticated features that capture 
+                financial intuition: momentum, mean reversion, volatility clustering, and market microstructure. 
+                <strong>Raw prices alone are insufficient for prediction.</strong>
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
