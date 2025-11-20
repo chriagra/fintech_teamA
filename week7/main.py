@@ -785,56 +785,6 @@ def main():
     print("\n🎨 Creating 3D Visualization...")
     fig_3d = visualize_clusters_3d(X_values, cluster_labels, tickers, optimal_k)
 
-    # Step 5: Export results
-    results.to_csv('cluster_results.csv', index=False)
-    print("\n✅ Results saved to 'cluster_results.csv'")
-
-    # Optional: Interactive 3D plot using plotly
-    try:
-        import plotly.graph_objects as go
-
-        if X_values.shape[1] >= 3:
-            pca_3d = PCA(n_components=3)
-            X_3d = pca_3d.fit_transform(X_values)
-        else:
-            X_3d = X_values[:, :3] if X_values.shape[1] >= 3 else np.column_stack(
-                [X_values, np.zeros((len(X_values), 3 - X_values.shape[1]))])
-
-        # Define bold colors for plotly
-        plotly_colors = ['red', 'blue', 'green', 'magenta', 'gold',
-                         'cyan', 'orangered', 'blueviolet', 'crimson', 'limegreen'][:optimal_k]
-
-        fig_plotly = go.Figure()
-
-        for i in range(optimal_k):
-            mask = cluster_labels == i
-            fig_plotly.add_trace(go.Scatter3d(
-                x=X_3d[mask, 0],
-                y=X_3d[mask, 1],
-                z=X_3d[mask, 2],
-                mode='markers+text',
-                marker=dict(size=10, color=plotly_colors[i], line=dict(color='black', width=1)),
-                text=[tickers[j] for j in range(len(tickers)) if mask[j]],
-                textposition='top center',
-                textfont=dict(size=8),
-                name=f'Cluster {i}'
-            ))
-
-        fig_plotly.update_layout(
-            title=dict(text=f'<b>Interactive 3D Stock Clustering<br>{optimal_k} Clusters</b>', font=dict(size=20)),
-            scene=dict(
-                xaxis_title='PC1',
-                yaxis_title='PC2',
-                zaxis_title='PC3'
-            ),
-            height=800
-        )
-
-        fig_plotly.show()
-        print("✅ Interactive 3D plot displayed")
-
-    except ImportError:
-        print("\n⚠️ Install plotly for interactive 3D visualization: pip install plotly")
 
     print("\n" + "=" * 60)
     print("🏁 ANALYSIS COMPLETE")
