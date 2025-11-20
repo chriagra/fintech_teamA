@@ -7,15 +7,6 @@ warnings.filterwarnings('ignore')
 import yfinance as yf
 from datetime import datetime, timedelta
 
-# Visualization libraries
-from scipy import stats
-
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from xgboost import XGBRegressor
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.model_selection import cross_val_score, cross_validate
-import shap
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -33,7 +24,6 @@ plt.rcParams['figure.figsize'] = (12, 8)
 plt.style.use('seaborn-v0_8-darkgrid')
 sns.set_palette("bright")
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 def load_data(symbols):
 
@@ -785,11 +775,9 @@ def main():
     print("\n🎨 Creating 3D Visualization...")
     fig_3d = visualize_clusters_3d(X_values, cluster_labels, tickers, optimal_k)
 
-
     print("\n" + "=" * 60)
     print("🏁 ANALYSIS COMPLETE")
     print("=" * 60)
-
 
     pass
 
